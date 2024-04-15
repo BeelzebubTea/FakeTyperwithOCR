@@ -13,7 +13,7 @@ This Python program simulates human typing behavior with various features such a
 ## Usage
 
 1. Install the required dependencies listed in the `requirements.txt` file using `pip install -r requirements.txt`.
-2. Run the program using `python fake_typing_simulator.py`.
+2. Run the program using `python faketypingocr.py`.
 3. Customize the typing settings and start the typing simulation.
 
 ## Requirements
