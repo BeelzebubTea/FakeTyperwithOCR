@@ -23,4 +23,4 @@ This Python program simulates human typing behavior with various features such a
 
 ## License
 
-This project is licensed under the MIT License - see the (LICENSE.md) file for details.
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
