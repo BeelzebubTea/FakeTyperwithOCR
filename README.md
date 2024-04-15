@@ -16,11 +16,6 @@ This Python program simulates human typing behavior with various features such a
 2. Run the program using `python faketypingocr.py`.
 3. Customize the typing settings and start the typing simulation.
 
-## Requirements
-
-- Python 3.10
-- Dependencies listed in `requirements.txt`
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
