@@ -133,7 +133,7 @@ def start_typing():
     typo_chars = int(typo_chars_entry.get())
     typo_percentage = float(typo_percentage_entry.get())
     grace_period = 8  # Adjust this value according to your preference
-    countdown(5)
+    countdown(3)
     lock_input_controls()
     start_button.config(state="disabled")
     if block_input_var.get():
