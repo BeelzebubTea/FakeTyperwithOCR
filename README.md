@@ -18,7 +18,7 @@ This Python program simulates human typing behavior with various features such a
 
 ## Requirements
 
-- Python 3.x
+- Python 3.10
 - Dependencies listed in `requirements.txt`
 
 ## License
