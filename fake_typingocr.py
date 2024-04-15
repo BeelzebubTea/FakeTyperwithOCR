@@ -164,7 +164,7 @@ def on_click(x, y, button, pressed):
 
 def ocr_text():
     global listener
-    countdown(3, ocr=True)
+    countdown(1, ocr=True)
 
     # Create a fullscreen window to perform the select region action
     win = tk.Toplevel()
@@ -393,15 +393,17 @@ block_input_var = tk.BooleanVar()
 block_input_checkbox = ttk.Checkbutton(window, text="Block Keyboard Input", variable=block_input_var)
 block_input_checkbox.pack()
 
+# Create and pack the OCR button
+ocr_label = ttk.Label(window, text="Press F1 to start OCR")
+ocr_label.pack()
+ocr_button = ttk.Button(window, text="OCR", command=ocr_text, name="ocr_button")
+ocr_button.pack()
+
 # Create and pack the pause/resume button
-pause_resume_button = ttk.Button(window, text="Pause", command=pause_resume_typing)
-pause_resume_button.pack()
 hotkey_label = ttk.Label(window, text="Press F2 to Pause")
 hotkey_label.pack()
-
-# Create and pack the OCR button
-ocr_button = ttk.Button(window, text="OCR", command=ocr_text)
-ocr_button.pack()
+pause_resume_button = ttk.Button(window, text="Pause", command=pause_resume_typing)
+pause_resume_button.pack()
 
 # Create and pack the countdown label
 countdown_label = ttk.Label(window, text="", font=("Helvetica", 16))
@@ -433,6 +435,11 @@ reset_button.pack(side=tk.LEFT)
 
 # Bind the F2 key to pause/resume the program
 keyboard.on_press_key("f2", pause_resume_typing)
+
+# Bind the F1 key to start OCR
+def on_f1_press(event):
+    ocr_button.invoke()
+window.bind("<F1>", on_f1_press)
 
 is_paused = False
 current_index = 0
