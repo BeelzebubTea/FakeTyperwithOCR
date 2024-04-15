@@ -8,6 +8,9 @@ import threading
 import pyautogui
 from pynput import mouse
 from PIL import Image
+from PIL import ImageTk
+from PIL import ImageGrab
+from PIL import ImageEnhance
 from pytesseract import pytesseract
 
 path_to_tesseract = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
@@ -162,45 +165,87 @@ def on_click(x, y, button, pressed):
 def ocr_text():
     global listener
     countdown(3, ocr=True)
-    listener = mouse.Listener(on_click=on_click)
-    listener.start()
-    listener.join()
 
-    # Get the screen dimensions
-    screen_width, screen_height = pyautogui.size()
+    # Create a fullscreen window to perform the select region action
+    win = tk.Toplevel()
+    win.attributes('-fullscreen', 1)
+    win.attributes('-topmost', 1)
+    canvas = tk.Canvas(win, highlightthickness=0)
+    canvas.pack(fill='both', expand=1)
 
-    # Ensure the selected area stays within the screen boundaries
-    left = max(0, min(on_click.rx, on_click.rx2))
-    top = max(0, min(on_click.ry, on_click.ry2))
-    right = min(screen_width, max(on_click.rx, on_click.rx2))
-    bottom = min(screen_height, max(on_click.ry, on_click.ry2))
+    # Grab the fullscreen as select region background and darken it
+    image = ImageGrab.grab()
+    bgimage = ImageEnhance.Brightness(image).enhance(0.3)
+    tkimage = ImageTk.PhotoImage(bgimage)
+    canvas.create_image(0, 0, image=tkimage, anchor='nw', tag='images')
 
-    # Calculate the width and height of the selected area
-    width = right - left
-    height = bottom - top
+    roi_image = None
+    rect_id = None
 
-    # Capture the screenshot of the selected area
-    ss = pyautogui.screenshot(region=(left, top, width, height))
-    ss.save(r"text.png")
+    def on_mouse_down(event):
+        nonlocal rect_id
+        x1, y1 = event.x, event.y
+        rect_id = canvas.create_rectangle(x1, y1, x1, y1, outline='red', tag='roi')
 
-    img = cv2.imread('text.png', cv2.IMREAD_GRAYSCALE)
-    text = pytesseract.image_to_string(img)
+    def on_mouse_move(event):
+        nonlocal roi_image, rect_id
+        x2, y2 = event.x, event.y
+        canvas.delete('roi-image')  # Remove old overlay image
+        roi_image = image.crop((canvas.coords(rect_id)[0], canvas.coords(rect_id)[1], x2, y2))  # Get the image of selected region
+        canvas.image = ImageTk.PhotoImage(roi_image)
+        canvas.create_image(canvas.coords(rect_id)[0], canvas.coords(rect_id)[1], image=canvas.image, tag=('roi-image'), anchor='nw')
+        canvas.coords(rect_id, canvas.coords(rect_id)[0], canvas.coords(rect_id)[1], x2, y2)  # Update the select rectangle
+        canvas.lift('roi')  # Make sure the select rectangle is on top of the overlay image
 
-    # Remove extra new lines and join sentences
-    text = text.replace('-\n', '').replace('\n', ' ')
-    text = ' '.join(text.split())
-    
-    with open("words.txt", "w") as file:
-        file.write(text)
-    with open('words.txt', 'r') as file:
-        filedata = file.read()
-    filedata = filedata.replace('|', 'I')
-    filedata = filedata.replace('\\', 'I')
-    text_entry.delete("1.0", tk.END)
-    text_entry.insert(tk.END, filedata)
+    def on_mouse_release(event):
+        nonlocal rect_id
+        if rect_id:
+            x1, y1, x2, y2 = canvas.coords(rect_id)
+            win.destroy()
+            x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)  # Convert coordinates to integers
+            ss = pyautogui.screenshot(region=(x1, y1, x2 - x1, y2 - y1))
+            ss.save(r"text.png")
 
-    # Update the message in the countdown_label
-    countdown_label.config(text="OCR completed. Text captured!")
+            img = cv2.imread('text.png', cv2.IMREAD_GRAYSCALE)
+            text = pytesseract.image_to_string(img)
+
+            # Remove extra new lines and join sentences
+            text = text.replace('-\n', '').replace('\n', ' ')
+            text = ' '.join(text.split())
+        
+            with open("words.txt", "w") as file:
+                file.write(text)
+            with open('words.txt', 'r') as file:
+                filedata = file.read()
+            
+            filedata = filedata.replace('|', 'I')
+            filedata = filedata.replace('\\', 'I')
+            filedata = filedata.replace('|f', 'If')
+            filedata = filedata.replace('Guest', '')
+            filedata = filedata.replace('>', '')
+            filedata = filedata.replace('\\', '')
+            filedata = filedata.replace('change display format', '')
+            filedata = filedata.replace('Vh', 'Wh')
+            text_entry.delete("1.0", tk.END)
+            text_entry.insert(tk.END, filedata)
+
+            # Update the message in the countdown_label
+            countdown_label.config(text="OCR completed. Text captured!")
+        else:
+            win.destroy()
+
+    # Bind the mouse events for selecting region
+    win.bind('<ButtonPress-1>', on_mouse_down)
+    win.bind('<B1-Motion>', on_mouse_move)
+    win.bind('<ButtonRelease-1>', on_mouse_release)
+
+    # Use Esc key to abort the capture
+    win.bind('<Escape>', lambda e: win.destroy())
+
+    # Make the capture window modal
+    win.focus_force()
+    win.grab_set()
+    win.wait_window(win)
         
 def block_keyboard_input():
     keyboard.block_key('a')
@@ -229,6 +274,8 @@ def block_keyboard_input():
     keyboard.block_key('x')
     keyboard.block_key('y')
     keyboard.block_key('z')
+    keyboard.block_key('backspace')
+    keyboard.block_key('enter')
 
 def unblock_keyboard_input():
     keyboard.unblock_key('a')
@@ -257,6 +304,8 @@ def unblock_keyboard_input():
     keyboard.unblock_key('x')
     keyboard.unblock_key('y')
     keyboard.unblock_key('z')
+    keyboard.unblock_key('backspace')
+    keyboard.unblock_key('enter')
 
 def update_char_speed_label(value):
     char_speed_label.config(text=f"Character Delay Range (seconds): {value}")
