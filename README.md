@@ -9,6 +9,7 @@ This Python program simulates human typing behavior with various features such a
 - **Grace Period:** Set a grace period between consecutive typos to make the typing simulation more realistic.
 - **Realistic Typing Simulation:** Mimics human typing behavior for a more natural and engaging experience.
 - **User Interface:** Includes a graphical user interface (GUI) for easy interaction and visualization of the typing simulation progress.
+- **TypeRacer Bot:** Tested and trialed on TypeRacer.
 
 ## Usage
 
