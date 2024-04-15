@@ -394,7 +394,7 @@ block_input_checkbox = ttk.Checkbutton(window, text="Block Keyboard Input", vari
 block_input_checkbox.pack()
 
 # Create and pack the OCR button
-ocr_label = ttk.Label(window, text="Press F1 to start OCR \n(Window must be in focus)", justify=tk.CENTER)
+ocr_label = ttk.Label(window, text="Press F1 to start OCR \n(Window must be in focus to initiate)", justify=tk.CENTER)
 ocr_label.pack()
 ocr_button = ttk.Button(window, text="OCR", command=ocr_text, name="ocr_button")
 ocr_button.pack()
