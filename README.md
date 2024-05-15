@@ -1,4 +1,4 @@
-# Fake Typing Simulator with OCR
+# Typing Simulator with OCR
 
 This Python program simulates human typing behavior with various features such as customizable typing speeds, typo generation, and grace periods between typos. It also has OCR functionality
 
